@@ -7,7 +7,9 @@
 [link-tests]: https://github.com/scverse/simple-scvi/actions/workflows/test.yml
 [badge-docs]: https://img.shields.io/readthedocs/simple-scvi
 
-External and simple implementation of scVI
+External and simple implementation of scVI. This repository shows a minimal example of implementing [scVI](https://www.nature.com/articles/s41592-018-0229-2) with [scvi-tools](https://scvi-tools.org) as well as using the [cookicutter-scverse](https://github.com/scverse/cookiecutter-scverse) template.
+
+We advise all external projects to use the cookicutter template.
 
 ## Getting started
 
