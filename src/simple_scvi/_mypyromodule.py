@@ -1,9 +1,14 @@
+from typing import Dict
+
 import pyro
 import pyro.distributions as dist
 import torch
+from pyro import poutine
 from scvi import REGISTRY_KEYS
 from scvi.module.base import PyroBaseModuleClass, auto_move_data
 from scvi.nn import DecoderSCVI, Encoder
+
+TensorDict = Dict[str, torch.Tensor]
 
 
 class MyPyroModule(PyroBaseModuleClass):
@@ -51,16 +56,16 @@ class MyPyroModule(PyroBaseModuleClass):
         self.px_r = torch.nn.Parameter(torch.ones(self.n_input))
 
     @staticmethod
-    def _get_fn_args_from_batch(tensor_dict):
+    def _get_fn_args_from_batch(tensor_dict: TensorDict):
         x = tensor_dict[REGISTRY_KEYS.X_KEY]
         log_library = torch.log(torch.sum(x, dim=1, keepdim=True) + 1e-6)
         return (x, log_library), {}
 
-    def model(self, x, log_library):
+    def model(self, x: torch.Tensor, log_library: torch.Tensor, kl_weight: int = 1.0):
         """Pyro model."""
         # register PyTorch module `decoder` with Pyro
         pyro.module("scvi", self)
-        with pyro.plate("data", x.shape[0]):
+        with pyro.plate("data", size=x.shape[0], subsample_size=x.shape[0]), poutine.scale(None, kl_weight):
             # setup hyperparameters for prior p(z)
             z_loc = x.new_zeros(torch.Size((x.shape[0], self.n_latent)))
             z_scale = x.new_ones(torch.Size((x.shape[0], self.n_latent)))
@@ -76,7 +81,7 @@ class MyPyroModule(PyroBaseModuleClass):
             # score against actual counts
             pyro.sample("obs", x_dist.to_event(1), obs=x)
 
-    def guide(self, x, log_library):
+    def guide(self, x: torch.Tensor, log_library: torch.Tensor):
         """Pyro guide."""
         # define the guide (i.e. variational distribution) q(z|x)
         pyro.module("scvi", self)
@@ -89,9 +94,9 @@ class MyPyroModule(PyroBaseModuleClass):
 
     @torch.no_grad()
     @auto_move_data
-    def get_latent(self, tensors):
+    def get_latent(self, tensor_dict: TensorDict):
         """Get the latent representation of the data."""
-        x = tensors[REGISTRY_KEYS.X_KEY]
+        x = tensor_dict[REGISTRY_KEYS.X_KEY]
         x_ = torch.log(1 + x)
         z_loc, _, _ = self.encoder(x_)
         return z_loc
