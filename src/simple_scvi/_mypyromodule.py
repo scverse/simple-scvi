@@ -65,12 +65,13 @@ class MyPyroModule(PyroBaseModuleClass):
         """Pyro model."""
         # register PyTorch module `decoder` with Pyro
         pyro.module("scvi", self)
-        with pyro.plate("data", size=x.shape[0], subsample_size=x.shape[0]), poutine.scale(None, kl_weight):
-            # setup hyperparameters for prior p(z)
-            z_loc = x.new_zeros(torch.Size((x.shape[0], self.n_latent)))
-            z_scale = x.new_ones(torch.Size((x.shape[0], self.n_latent)))
-            # sample from prior (value will be sampled by guide when computing the ELBO)
-            z = pyro.sample("latent", dist.Normal(z_loc, z_scale).to_event(1))
+        with pyro.plate("data", size=x.shape[0], subsample_size=x.shape[0]):
+            with poutine.scale(None, kl_weight):
+                # setup hyperparameters for prior p(z)
+                z_loc = x.new_zeros(torch.Size((x.shape[0], self.n_latent)))
+                z_scale = x.new_ones(torch.Size((x.shape[0], self.n_latent)))
+                # sample from prior (value will be sampled by guide when computing the ELBO)
+                z = pyro.sample("latent", dist.Normal(z_loc, z_scale).to_event(1))
             # decode the latent code z
             px_scale, _, px_rate, px_dropout = self.decoder("gene", z, log_library)
             # build count distribution
@@ -81,11 +82,11 @@ class MyPyroModule(PyroBaseModuleClass):
             # score against actual counts
             pyro.sample("obs", x_dist.to_event(1), obs=x)
 
-    def guide(self, x: torch.Tensor, log_library: torch.Tensor):
+    def guide(self, x: torch.Tensor, log_library: torch.Tensor, kl_weight: float = 1.0):
         """Pyro guide."""
         # define the guide (i.e. variational distribution) q(z|x)
         pyro.module("scvi", self)
-        with pyro.plate("data", x.shape[0]):
+        with pyro.plate("data", x.shape[0]), poutine.scale(None, kl_weight):
             # use the encoder to get the parameters used to define q(z|x)
             x_ = torch.log(1 + x)
             z_loc, z_scale, _ = self.encoder(x_)
