@@ -22,7 +22,10 @@ urls.Home-page = "https://github.com/scverse/simple-scvi"
 dependencies = [
     "anndata",
     # for debug logging (referenced from the issue template)
-    "session-info"
+    "session-info",
+    "rich",
+    "scvi-tools",
+    "torch",
 ]
 
 [project.optional-dependencies]
