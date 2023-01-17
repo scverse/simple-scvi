@@ -61,7 +61,7 @@ class MyPyroModule(PyroBaseModuleClass):
         log_library = torch.log(torch.sum(x, dim=1, keepdim=True) + 1e-6)
         return (x, log_library), {}
 
-    def model(self, x: torch.Tensor, log_library: torch.Tensor, kl_weight: int = 1.0):
+    def model(self, x: torch.Tensor, log_library: torch.Tensor, kl_weight: float = 1.0):
         """Pyro model."""
         # register PyTorch module `decoder` with Pyro
         pyro.module("scvi", self)

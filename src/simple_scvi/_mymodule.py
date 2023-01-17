@@ -1,3 +1,5 @@
+from typing import Dict
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -7,6 +9,8 @@ from scvi.module.base import BaseModuleClass, LossRecorder, auto_move_data
 from scvi.nn import DecoderSCVI, Encoder, one_hot
 from torch.distributions import Normal
 from torch.distributions import kl_divergence as kl
+
+TensorDict = Dict[str, torch.Tensor]
 
 
 class MyModule(BaseModuleClass):
@@ -221,5 +225,39 @@ class MyModule(BaseModuleClass):
 
     @torch.no_grad()
     @auto_move_data
-    def marginal_ll(self, tensors, n_mc_samples):
+    def marginal_ll(self, tensors: TensorDict, n_mc_samples: int):
         """Marginal ll."""
+        sample_batch = tensors[REGISTRY_KEYS.X_KEY]
+        batch_index = tensors[REGISTRY_KEYS.BATCH_KEY]
+
+        to_sum = torch.zeros(sample_batch.size()[0], n_mc_samples)
+
+        for i in range(n_mc_samples):
+            # Distribution parameters and sampled variables
+            inference_outputs, _, losses = self.forward(tensors)
+            qz_m = inference_outputs["qz_m"]
+            qz_v = inference_outputs["qz_v"]
+            z = inference_outputs["z"]
+            ql_m = inference_outputs["ql_m"]
+            ql_v = inference_outputs["ql_v"]
+            library = inference_outputs["library"]
+
+            # Reconstruction Loss
+            reconst_loss = losses.reconstruction_loss
+
+            # Log-probabilities
+            n_batch = self.library_log_means.shape[1]
+            local_library_log_means = F.linear(one_hot(batch_index, n_batch), self.library_log_means)
+            local_library_log_vars = F.linear(one_hot(batch_index, n_batch), self.library_log_vars)
+            p_l = Normal(local_library_log_means, local_library_log_vars.sqrt()).log_prob(library).sum(dim=-1)
+
+            p_z = Normal(torch.zeros_like(qz_m), torch.ones_like(qz_v)).log_prob(z).sum(dim=-1)
+            p_x_zl = -reconst_loss
+            q_z_x = Normal(qz_m, qz_v.sqrt()).log_prob(z).sum(dim=-1)
+            q_l_x = Normal(ql_m, ql_v.sqrt()).log_prob(library).sum(dim=-1)
+
+            to_sum[:, i] = p_z + p_l + p_x_zl - q_z_x - q_l_x
+
+        batch_log_lkl = torch.logsumexp(to_sum, dim=-1) - np.log(n_mc_samples)
+        log_lkl = torch.sum(batch_log_lkl).item()
+        return log_lkl
