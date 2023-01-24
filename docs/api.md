@@ -11,6 +11,4 @@
 
     MyModel
     MyPyroModel
-    MyModule
-    MyPyroModule
 ```
