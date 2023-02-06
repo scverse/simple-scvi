@@ -204,7 +204,10 @@ class MyModule(BaseModuleClass):
             tensor with shape (n_cells, n_genes, n_samples)
         """
         inference_kwargs = dict(n_samples=n_samples)
-        _, generative_outputs, = self.forward(
+        (
+            _,
+            generative_outputs,
+        ) = self.forward(
             tensors,
             inference_kwargs=inference_kwargs,
             compute_loss=False,
