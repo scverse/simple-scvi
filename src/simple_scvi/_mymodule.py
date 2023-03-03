@@ -245,7 +245,7 @@ class MyModule(BaseModuleClass):
             library = inference_outputs["library"]
 
             # Reconstruction Loss
-            reconst_loss = losses.reconstruction_loss
+            reconst_loss = losses.dict_sum(losses.reconstruction_loss)
 
             # Log-probabilities
             n_batch = self.library_log_means.shape[1]
