@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 from scvi import REGISTRY_KEYS
 from scvi.distributions import ZeroInflatedNegativeBinomial
-from scvi.module.base import BaseModuleClass, LossRecorder, auto_move_data
+from scvi.module.base import BaseModuleClass, LossOutput, auto_move_data
 from scvi.nn import DecoderSCVI, Encoder, one_hot
 from torch.distributions import Normal
 from torch.distributions import kl_divergence as kl
@@ -175,8 +175,7 @@ class MyModule(BaseModuleClass):
         loss = torch.mean(reconst_loss + weighted_kl_local)
 
         kl_local = dict(kl_divergence_l=kl_divergence_l, kl_divergence_z=kl_divergence_z)
-        kl_global = torch.tensor(0.0)
-        return LossRecorder(loss, reconst_loss, kl_local, kl_global)
+        return LossOutput(loss=loss, reconstruction_loss=reconst_loss, kl_local=kl_local)
 
     @torch.no_grad()
     def sample(
