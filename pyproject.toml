@@ -24,7 +24,7 @@ dependencies = [
     # for debug logging (referenced from the issue template)
     "session-info",
     "rich",
-    "scvi-tools",
+    "scvi-tools>=0.20.1",
     "torch",
 ]
 
