@@ -49,7 +49,18 @@ If you found a bug, please use the [issue tracker][issue-tracker].
 
 ## Citation
 
-> t.b.a
+```
+@article{gayoso2022python,
+  title={A Python library for probabilistic analysis of single-cell omics data},
+  author={Gayoso, Adam and Lopez, Romain and Xing, Galen and Boyeau, Pierre and Valiollah Pour Amiri, Valeh and Hong, Justin and Wu, Katherine and Jayasuriya, Michael and Mehlman, Edouard and Langevin, Maxime and others},
+  journal={Nature biotechnology},
+  volume={40},
+  number={2},
+  pages={163--166},
+  year={2022},
+  publisher={Nature Publishing Group US New York}
+}
+```
 
 [scverse-discourse]: https://discourse.scverse.org/
 [issue-tracker]: https://github.com/adamgayoso/simple-scvi/issues
