@@ -31,7 +31,6 @@ class MyPyroModule(PyroBaseModuleClass):
     """
 
     def __init__(self, n_input: int, n_latent: int, n_hidden: int, n_layers: int):
-
         super().__init__()
         self.n_input = n_input
         self.n_latent = n_latent
