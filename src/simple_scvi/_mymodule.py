@@ -93,7 +93,7 @@ class MyModule(BaseModuleClass):
         """Parse the dictionary to get appropriate args"""
         x = tensors[REGISTRY_KEYS.X_KEY]
 
-        input_dict = dict(x=x)
+        input_dict = {"x": x}
         return input_dict
 
     def _get_generative_input(self, tensors, inference_outputs):
@@ -119,7 +119,7 @@ class MyModule(BaseModuleClass):
         qz_m, qz_v, z = self.z_encoder(x_)
         ql_m, ql_v, library = self.l_encoder(x_)
 
-        outputs = dict(z=z, qz_m=qz_m, qz_v=qz_v, ql_m=ql_m, ql_v=ql_v, library=library)
+        outputs = {"z": z, "qz_m": qz_m, "qz_v": qz_v, "ql_m": ql_m, "ql_v": ql_v, "library": library}
         return outputs
 
     @auto_move_data
@@ -129,7 +129,7 @@ class MyModule(BaseModuleClass):
         px_scale, _, px_rate, px_dropout = self.decoder("gene", z, library)
         px_r = torch.exp(self.px_r)
 
-        return dict(px_scale=px_scale, px_r=px_r, px_rate=px_rate, px_dropout=px_dropout)
+        return {"px_scale": px_scale, "px_r": px_r, "px_rate": px_rate, "px_dropout": px_dropout}
 
     def loss(
         self,
@@ -174,7 +174,7 @@ class MyModule(BaseModuleClass):
 
         loss = torch.mean(reconst_loss + weighted_kl_local)
 
-        kl_local = dict(kl_divergence_l=kl_divergence_l, kl_divergence_z=kl_divergence_z)
+        kl_local = {"kl_divergence_l": kl_divergence_l, "kl_divergence_z": kl_divergence_z}
         return LossOutput(loss=loss, reconstruction_loss=reconst_loss, kl_local=kl_local)
 
     @torch.no_grad()
@@ -202,7 +202,7 @@ class MyModule(BaseModuleClass):
         x_new
             tensor with shape (n_cells, n_genes, n_samples)
         """
-        inference_kwargs = dict(n_samples=n_samples)
+        inference_kwargs = {"n_samples": n_samples}
         (
             _,
             generative_outputs,
