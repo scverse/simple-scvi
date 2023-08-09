@@ -6,12 +6,8 @@ import torch
 from anndata import AnnData
 from scvi import REGISTRY_KEYS
 from scvi.data import AnnDataManager
-from scvi.data.fields import (
-    CategoricalJointObsField,
-    CategoricalObsField,
-    LayerField,
-    NumericalJointObsField,
-)
+from scvi.data.fields import (CategoricalJointObsField, CategoricalObsField,
+                              LayerField, NumericalJointObsField)
 from scvi.dataloaders import DataSplitter
 from scvi.model.base import BaseModelClass
 from scvi.train import PyroTrainingPlan, TrainRunner
