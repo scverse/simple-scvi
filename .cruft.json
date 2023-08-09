@@ -1,23 +1,23 @@
 {
-    "template": "https://github.com/scverse/cookiecutter-scverse",
-    "commit": "7cc5403b05e299d7a4bb169c2bd8c27a2a7676f3",
-    "checkout": null,
-    "context": {
-        "cookiecutter": {
-            "project_name": "simple-scvi",
-            "package_name": "simple_scvi",
-            "project_description": "External and simple implementation of scVI",
-            "author_full_name": "Adam Gayoso",
-            "author_email": "adamgayoso@berkeley.edu",
-            "github_user": "adamgayoso",
-            "project_repo": "https://github.com/scverse/simple-scvi",
-            "license": "BSD 3-Clause License",
-            "_copy_without_render": [
-                ".github/workflows/**.yaml",
-                "docs/_templates/autosummary/**.rst"
-            ],
-            "_template": "https://github.com/scverse/cookiecutter-scverse"
-        }
-    },
-    "directory": null
+  "template": "https://github.com/scverse/cookiecutter-scverse",
+  "commit": "23a9eaaf101dc9b6d31976f32f7345e1b209b071",
+  "checkout": "v0.2.21",
+  "context": {
+    "cookiecutter": {
+      "project_name": "simple-scvi",
+      "package_name": "simple_scvi",
+      "project_description": "External and simple implementation of scVI",
+      "author_full_name": "Adam Gayoso",
+      "author_email": "adamgayoso@berkeley.edu",
+      "github_user": "adamgayoso",
+      "project_repo": "https://github.com/scverse/simple-scvi",
+      "license": "BSD 3-Clause License",
+      "_copy_without_render": [
+        ".github/workflows/**.yaml",
+        "docs/_templates/autosummary/**.rst"
+      ],
+      "_template": "https://github.com/scverse/cookiecutter-scverse"
+    }
+  },
+  "directory": null
 }
