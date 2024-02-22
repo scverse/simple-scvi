@@ -19,7 +19,7 @@ Please refer to the [documentation][link-docs]. In particular, the
 
 ## Installation
 
-You need to have Python 3.8 or newer installed on your system. If you don't have
+You need to have Python 3.9 or newer installed on your system. If you don't have
 Python installed, we recommend installing [Mambaforge](https://github.com/conda-forge/miniforge#mambaforge).
 
 There are several alternative options to install simple-scvi:
@@ -35,7 +35,7 @@ pip install simple-scvi
 1. Install the latest development version:
 
 ```bash
-pip install git+https://github.com/adamgayoso/simple-scvi.git@main
+pip install git+https://github.com/scverse/simple-scvi.git@main
 ```
 
 ## Release notes

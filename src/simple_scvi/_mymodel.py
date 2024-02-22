@@ -4,12 +4,8 @@ from typing import List, Optional
 from anndata import AnnData
 from scvi import REGISTRY_KEYS
 from scvi.data import AnnDataManager
-from scvi.data.fields import (
-    CategoricalJointObsField,
-    CategoricalObsField,
-    LayerField,
-    NumericalJointObsField,
-)
+from scvi.data.fields import (CategoricalJointObsField, CategoricalObsField,
+                              LayerField, NumericalJointObsField)
 from scvi.model._utils import _init_library_size
 from scvi.model.base import BaseModelClass, UnsupervisedTrainingMixin, VAEMixin
 from scvi.utils import setup_anndata_dsp
@@ -57,7 +53,9 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
     ):
         super().__init__(adata)
 
-        library_log_means, library_log_vars = _init_library_size(self.adata_manager, self.summary_stats["n_batch"])
+        library_log_means, library_log_vars = _init_library_size(
+            self.adata_manager, self.summary_stats["n_batch"]
+        )
 
         # self.summary_stats provides information about anndata dimensions and other tensor info
 
@@ -108,9 +106,15 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
             LayerField(REGISTRY_KEYS.X_KEY, layer, is_count_data=True),
             CategoricalObsField(REGISTRY_KEYS.BATCH_KEY, batch_key),
             CategoricalObsField(REGISTRY_KEYS.LABELS_KEY, labels_key),
-            CategoricalJointObsField(REGISTRY_KEYS.CAT_COVS_KEY, categorical_covariate_keys),
-            NumericalJointObsField(REGISTRY_KEYS.CONT_COVS_KEY, continuous_covariate_keys),
+            CategoricalJointObsField(
+                REGISTRY_KEYS.CAT_COVS_KEY, categorical_covariate_keys
+            ),
+            NumericalJointObsField(
+                REGISTRY_KEYS.CONT_COVS_KEY, continuous_covariate_keys
+            ),
         ]
-        adata_manager = AnnDataManager(fields=anndata_fields, setup_method_args=setup_method_args)
+        adata_manager = AnnDataManager(
+            fields=anndata_fields, setup_method_args=setup_method_args
+        )
         adata_manager.register_fields(adata, **kwargs)
         cls.register_manager(adata_manager)
