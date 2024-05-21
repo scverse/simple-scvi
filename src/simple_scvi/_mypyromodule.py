@@ -74,7 +74,9 @@ class MyPyroModule(PyroBaseModuleClass):
             # decode the latent code z
             px_scale, _, px_rate, px_dropout = self.decoder("gene", z, log_library)
             # build count distribution
-            nb_logits = (px_rate + self.epsilon).log() - (self.px_r.exp() + self.epsilon).log()
+            nb_logits = (px_rate + self.epsilon).log() - (
+                self.px_r.exp() + self.epsilon
+            ).log()
             x_dist = dist.ZeroInflatedNegativeBinomial(
                 gate_logits=px_dropout, total_count=self.px_r.exp(), logits=nb_logits
             )
