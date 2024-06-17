@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import logging
-from typing import List, Optional
 
 from anndata import AnnData
 from scvi import REGISTRY_KEYS
@@ -14,22 +15,21 @@ from scvi.model._utils import _init_library_size
 from scvi.model.base import BaseModelClass, UnsupervisedTrainingMixin, VAEMixin
 from scvi.utils import setup_anndata_dsp
 
-from ._mymodule import MyModule
+from simple_scvi._mymodule import MyModule
 
 logger = logging.getLogger(__name__)
 
 
 class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
-    """
-    Skeleton for an scvi-tools model.
+    """Skeleton for an scvi-tools model.
 
-    Please use this skeleton to create new models. This is a simple
-    implementation of the scVI model :cite:p:`Lopez18`.
+    Please use this skeleton to create new models. This is a simple implementation of the scVI
+    model :cite:p:`Lopez18`.
 
     Parameters
     ----------
     adata
-        AnnData object that has been registered via :meth:`~mypackage.MyModel.setup_anndata`.
+        AnnData object that has been registered via :meth:`~MyModel.setup_anndata`.
     n_hidden
         Number of nodes per hidden layer.
     n_latent
@@ -37,12 +37,13 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
     n_layers
         Number of hidden layers used for encoder and decoder NNs.
     **model_kwargs
-        Keyword args for :class:`~mypackage.MyModule`
+        Keyword args for :class:`~MyModule`
+
     Examples
     --------
     >>> adata = anndata.read_h5ad(path_to_anndata)
-    >>> mypackage.MyModel.setup_anndata(adata, batch_key="batch")
-    >>> vae = mypackage.MyModel(adata)
+    >>> simple_scvi.MyModel.setup_anndata(adata, batch_key="batch")
+    >>> vae = simple_scvi.MyModel(adata)
     >>> vae.train()
     >>> adata.obsm["X_mymodel"] = vae.get_latent_representation()
     """
@@ -54,10 +55,12 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
         n_latent: int = 10,
         n_layers: int = 1,
         **model_kwargs,
-    ):
+    ) -> None:
         super().__init__(adata)
 
-        library_log_means, library_log_vars = _init_library_size(self.adata_manager, self.summary_stats["n_batch"])
+        library_log_means, library_log_vars = _init_library_size(
+            self.adata_manager, self.summary_stats["n_batch"]
+        )
 
         # self.summary_stats provides information about anndata dimensions and other tensor info
 
@@ -70,7 +73,9 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
             library_log_vars=library_log_vars,
             **model_kwargs,
         )
-        self._model_summary_string = "Overwrite this attribute to get an informative representation for your model"
+        self._model_summary_string = (
+            "Overwrite this attribute to get an informative representation for your model"
+        )
         # necessary line to get params that will be used for saving/loading
         self.init_params_ = self._get_init_params(locals())
 
@@ -81,15 +86,14 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
     def setup_anndata(
         cls,
         adata: AnnData,
-        batch_key: Optional[str] = None,
-        labels_key: Optional[str] = None,
-        layer: Optional[str] = None,
-        categorical_covariate_keys: Optional[List[str]] = None,
-        continuous_covariate_keys: Optional[List[str]] = None,
+        batch_key: str | None = None,
+        labels_key: str | None = None,
+        layer: str | None = None,
+        categorical_covariate_keys: list[str] | None = None,
+        continuous_covariate_keys: list[str] | None = None,
         **kwargs,
-    ) -> Optional[AnnData]:
-        """
-        %(summary)s.
+    ) -> None:
+        """%(summary)s.
 
         Parameters
         ----------
@@ -99,6 +103,7 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
         %(param_layer)s
         %(param_cat_cov_keys)s
         %(param_cont_cov_keys)s
+
         Returns
         -------
         %(returns)s

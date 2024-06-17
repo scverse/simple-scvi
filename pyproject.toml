@@ -2,54 +2,51 @@
 build-backend = "hatchling.build"
 requires = ["hatchling"]
 
-
 [project]
 name = "simple-scvi"
 version = "0.0.1"
 description = "External and simple implementation of scVI"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {file = "LICENSE"}
 authors = [
-    {name = "Adam Gayoso"},
+    {name = "The scvi-tools development team"},
 ]
 maintainers = [
-    {name = "Adam Gayoso", email = "adamgayoso@berkeley.edu"},
+    {name = "The scvi-tools development team", email = "adamgayoso@berkeley.edu"},
 ]
 urls.Documentation = "https://simple-scvi.readthedocs.io/"
 urls.Source = "https://github.com/scverse/simple-scvi"
 urls.Home-page = "https://github.com/scverse/simple-scvi"
 dependencies = [
-    "anndata",
     # for debug logging (referenced from the issue template)
     "session-info",
-    "rich",
-    "scvi-tools>=0.20.1",
-    "torch",
+    "scvi-tools>=1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    # CLI for bumping the version number
-    "bump2version",
+    "jupyter",
     "pre-commit",
-    "twine>=4.0.2"
 ]
 doc = [
-    "sphinx>=4",
-    "sphinx-book-theme>=0.3.3",
+    "docutils>=0.20",
+    "ipython",
     "myst-nb",
+    "sphinx>=4.1",
     "sphinxcontrib-bibtex>=1.0.0",
     "sphinx-autodoc-typehints",
-    # For notebooks
-    "ipykernel",
-    "ipython",
+    "sphinx-book-theme>=1.0.1",
     "sphinx-copybutton",
 ]
 test = [
     "pytest",
-    "pytest-cov",
+    "pytest-pretty",
+    "coverage",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ['src/simple_scvi']
 
 [tool.coverage.run]
 source = ["simple_scvi"]
@@ -64,44 +61,96 @@ addopts = [
     "--import-mode=importlib",  # allow using test files with same name
 ]
 
-[tool.isort]
-include_trailing_comma = true
-multi_line_output = 3
-profile = "black"
-skip_glob = ["docs/*"]
+[tool.ruff]
+src = ["src"]
+line-length = 99
+indent-width = 4
+target-version = "py39"
 
-[tool.black]
-line-length = 120
-target-version = ['py38']
-include = '\.pyi?$'
-exclude = '''
-(
-  /(
-      \.eggs
-    | \.git
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
-)
-'''
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+[tool.ruff.lint]
+select = [
+    "F",  # Errors detected by Pyflakes
+    "E",  # Error detected by Pycodestyle
+    "W",  # Warning detected by Pycodestyle
+    "I",  # isort
+    "D",  # pydocstyle
+    "B",  # flake8-bugbear
+    "TID",  # flake8-tidy-imports
+    "C4",  # flake8-comprehensions
+    "BLE",  # flake8-blind-except
+    "UP",  # pyupgrade
+    "RUF100",  # Report unused noqa directives
+]
+ignore = [
+    # allow I, O, l as variable names -> I is the identity matrix
+    "E741",
+    # Missing docstring in public package
+    "D104",
+    # Missing docstring in public module
+    "D100",
+    # Missing docstring in __init__
+    "D107",
+    # Errors from function calls in argument defaults. These are fine when the result is immutable.
+    "B008",
+    # __magic__ methods are are often self-explanatory, allow missing docstrings
+    "D105",
+    # first line should end with a period [Bug: doesn't work with single-line docstrings]
+    "D400",
+    # First line should be in imperative mood; try rephrasing
+    "D401",
+    ## Disable one in each pair of mutually incompatible rules
+    # We don’t want a blank line before a class docstring
+    "D203",
+    # We want docstrings to start immediately after the opening triple quote
+    "D213",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"docs/*" = ["I", "BLE001"]
+"tests/*" = ["D"]
+"*/__init__.py" = ["F401"]
+"src/scvi/__init__.py" = ["I"]
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
 
 [tool.jupytext]
 formats = "ipynb,md"
-
-[tool.cruft]
-skip = [
-    "tests",
-    "src/**/__init__.py",
-    "src/**/basic.py",
-    "docs/api.md",
-    "docs/changelog.md",
-    "docs/references.bib",
-    "docs/references.md",
-    "docs/notebooks/example.ipynb"
-]

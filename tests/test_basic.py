@@ -14,7 +14,7 @@ def test_mymodel():
     model.get_latent_representation()
     model.get_marginal_ll(n_mc_samples=5)
     model.get_reconstruction_error()
-    model.history
+    _ = model.history
 
     # tests __repr__
     print(model)
@@ -27,7 +27,7 @@ def test_mypyromodel():
     model = MyPyroModel(adata)
     model.train(max_epochs=1, train_size=1)
     model.get_latent(adata)
-    model.history
+    _ = model.history
 
     # tests __repr__
     print(model)
