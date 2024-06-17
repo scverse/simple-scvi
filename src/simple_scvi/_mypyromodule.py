@@ -7,30 +7,28 @@ from pyro import poutine
 from scvi import REGISTRY_KEYS
 from scvi.module.base import PyroBaseModuleClass, auto_move_data
 from scvi.nn import DecoderSCVI, Encoder
-
-TensorDict = dict[str, torch.Tensor]
+from torch import Tensor
 
 
 class MyPyroModule(PyroBaseModuleClass):
-    """
-    Skeleton Variational auto-encoder Pyro model.
+    """Skeleton variational auto-encoder (VAE) Pyro model.
 
-    Here we implement a basic version of scVI's underlying VAE :cite:p:`Lopez18`.
-    This implementation is for instructional purposes only.
+    Here we implement a basic version of scVI's underlying VAE :cite:p:`Lopez18`. This
+    implementation is for instructional purposes only.
 
     Parameters
     ----------
     n_input
-        Number of input genes
+        Number of input genes.
     n_latent
-        Dimensionality of the latent space
+        Dimensionality of the latent space.
     n_hidden
-        Number of nodes per hidden layer
+        Number of nodes per hidden layer.
     n_layers
-        Number of hidden layers used for encoder and decoder NNs
+        Number of hidden layers used for encoder and decoder NNs.
     """
 
-    def __init__(self, n_input: int, n_latent: int, n_hidden: int, n_layers: int):
+    def __init__(self, n_input: int, n_latent: int, n_hidden: int, n_layers: int) -> None:
         super().__init__()
         self.n_input = n_input
         self.n_latent = n_latent
@@ -55,12 +53,14 @@ class MyPyroModule(PyroBaseModuleClass):
         self.px_r = torch.nn.Parameter(torch.ones(self.n_input))
 
     @staticmethod
-    def _get_fn_args_from_batch(tensor_dict: TensorDict):
+    def _get_fn_args_from_batch(
+        tensor_dict: dict[str, Tensor],
+    ) -> tuple[tuple[Tensor, Tensor], dict]:
         x = tensor_dict[REGISTRY_KEYS.X_KEY]
         log_library = torch.log(torch.sum(x, dim=1, keepdim=True) + 1e-6)
         return (x, log_library), {}
 
-    def model(self, x: torch.Tensor, log_library: torch.Tensor, kl_weight: float = 1.0):
+    def model(self, x: torch.Tensor, log_library: torch.Tensor, kl_weight: float = 1.0) -> None:
         """Pyro model."""
         # register PyTorch module `decoder` with Pyro
         pyro.module("scvi", self)
@@ -81,7 +81,7 @@ class MyPyroModule(PyroBaseModuleClass):
             # score against actual counts
             pyro.sample("obs", x_dist.to_event(1), obs=x)
 
-    def guide(self, x: torch.Tensor, log_library: torch.Tensor, kl_weight: float = 1.0):
+    def guide(self, x: torch.Tensor, log_library: torch.Tensor, kl_weight: float = 1.0) -> None:
         """Pyro guide."""
         # define the guide (i.e. variational distribution) q(z|x)
         pyro.module("scvi", self)
@@ -94,7 +94,7 @@ class MyPyroModule(PyroBaseModuleClass):
 
     @torch.no_grad()
     @auto_move_data
-    def get_latent(self, tensor_dict: TensorDict):
+    def get_latent(self, tensor_dict: dict[str, Tensor]) -> Tensor:
         """Get the latent representation of the data."""
         x = tensor_dict[REGISTRY_KEYS.X_KEY]
         x_ = torch.log(1 + x)

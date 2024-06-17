@@ -15,22 +15,21 @@ from scvi.model._utils import _init_library_size
 from scvi.model.base import BaseModelClass, UnsupervisedTrainingMixin, VAEMixin
 from scvi.utils import setup_anndata_dsp
 
-from ._mymodule import MyModule
+from simple_scvi._mymodule import MyModule
 
 logger = logging.getLogger(__name__)
 
 
 class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
-    """
-    Skeleton for an scvi-tools model.
+    """Skeleton for an scvi-tools model.
 
-    Please use this skeleton to create new models. This is a simple
-    implementation of the scVI model :cite:p:`Lopez18`.
+    Please use this skeleton to create new models. This is a simple implementation of the scVI
+    model :cite:p:`Lopez18`.
 
     Parameters
     ----------
     adata
-        AnnData object that has been registered via :meth:`~mypackage.MyModel.setup_anndata`.
+        AnnData object that has been registered via :meth:`~simple_scvi.MyModel.setup_anndata`.
     n_hidden
         Number of nodes per hidden layer.
     n_latent
@@ -38,13 +37,13 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
     n_layers
         Number of hidden layers used for encoder and decoder NNs.
     **model_kwargs
-        Keyword args for :class:`~mypackage.MyModule`
+        Keyword args for :class:`~simple_scvi.MyModule`
 
     Examples
     --------
     >>> adata = anndata.read_h5ad(path_to_anndata)
-    >>> mypackage.MyModel.setup_anndata(adata, batch_key="batch")
-    >>> vae = mypackage.MyModel(adata)
+    >>> simple_scvi.MyModel.setup_anndata(adata, batch_key="batch")
+    >>> vae = simple_scvi.MyModel(adata)
     >>> vae.train()
     >>> adata.obsm["X_mymodel"] = vae.get_latent_representation()
     """
@@ -56,7 +55,7 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
         n_latent: int = 10,
         n_layers: int = 1,
         **model_kwargs,
-    ):
+    ) -> None:
         super().__init__(adata)
 
         library_log_means, library_log_vars = _init_library_size(
@@ -93,9 +92,8 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
         categorical_covariate_keys: list[str] | None = None,
         continuous_covariate_keys: list[str] | None = None,
         **kwargs,
-    ) -> AnnData | None:
-        """
-        %(summary)s.
+    ) -> None:
+        """%(summary)s.
 
         Parameters
         ----------

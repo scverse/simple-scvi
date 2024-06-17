@@ -4,6 +4,7 @@ import logging
 from collections.abc import Sequence
 
 import numpy as np
+import numpy.typing as npt
 import torch
 from anndata import AnnData
 from scvi import REGISTRY_KEYS
@@ -26,15 +27,14 @@ logger = logging.getLogger(__name__)
 
 
 class MyPyroModel(BaseModelClass):
-    """
-    Skeleton for a pyro version of a scvi-tools model.
+    """Skeleton for a Pyro version of a scvi-tools model.
 
     Please use this skeleton to create new models.
 
     Parameters
     ----------
     adata
-        AnnData object that has been registered via :meth:`~mypackage.MyPyroModel.setup_anndata`.
+        AnnData object that has been registered via :meth:`~simple_scvi.MyPyroModel.setup_anndata`.
     n_hidden
         Number of nodes per hidden layer.
     n_latent
@@ -42,7 +42,7 @@ class MyPyroModel(BaseModelClass):
     n_layers
         Number of hidden layers used for encoder and decoder NNs.
     **model_kwargs
-        Keyword args for :class:`~mypackage.MyModule`
+        Keyword args for :class:`~simple_scvi.MyModule`
 
     Examples
     --------
@@ -60,7 +60,7 @@ class MyPyroModel(BaseModelClass):
         n_latent: int = 10,
         n_layers: int = 1,
         **model_kwargs,
-    ):
+    ) -> None:
         super().__init__(adata)
 
         # self.summary_stats provides information about anndata dimensions and other tensor info
@@ -85,9 +85,8 @@ class MyPyroModel(BaseModelClass):
         adata: AnnData | None = None,
         indices: Sequence[int] | None = None,
         batch_size: int | None = None,
-    ):
-        """
-        Return the latent representation for each cell.
+    ) -> npt.NDArray:
+        """Return the latent representation for each cell.
 
         This is denoted as :math:`z_n` in our manuscripts.
 
@@ -125,9 +124,8 @@ class MyPyroModel(BaseModelClass):
         batch_size: int = 128,
         plan_kwargs: dict | None = None,
         **trainer_kwargs,
-    ):
-        """
-        Train the model.
+    ) -> None:
+        """Train the model.
 
         Parameters
         ----------
@@ -184,9 +182,8 @@ class MyPyroModel(BaseModelClass):
         categorical_covariate_keys: list[str] | None = None,
         continuous_covariate_keys: list[str] | None = None,
         **kwargs,
-    ) -> AnnData | None:
-        """
-        %(summary)s.
+    ) -> None:
+        """%(summary)s.
 
         Parameters
         ----------
