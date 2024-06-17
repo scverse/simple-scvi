@@ -34,7 +34,7 @@ class MyPyroModel(BaseModelClass):
     Parameters
     ----------
     adata
-        AnnData object that has been registered via :meth:`~simple_scvi.MyPyroModel.setup_anndata`.
+        AnnData object that has been registered via :meth:`~MyPyroModel.setup_anndata`.
     n_hidden
         Number of nodes per hidden layer.
     n_latent
@@ -42,7 +42,7 @@ class MyPyroModel(BaseModelClass):
     n_layers
         Number of hidden layers used for encoder and decoder NNs.
     **model_kwargs
-        Keyword args for :class:`~simple_scvi.MyModule`
+        Keyword args for :class:`~MyModule`.
 
     Examples
     --------

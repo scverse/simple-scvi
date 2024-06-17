@@ -29,7 +29,7 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
     Parameters
     ----------
     adata
-        AnnData object that has been registered via :meth:`~simple_scvi.MyModel.setup_anndata`.
+        AnnData object that has been registered via :meth:`~MyModel.setup_anndata`.
     n_hidden
         Number of nodes per hidden layer.
     n_latent
@@ -37,7 +37,7 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
     n_layers
         Number of hidden layers used for encoder and decoder NNs.
     **model_kwargs
-        Keyword args for :class:`~simple_scvi.MyModule`
+        Keyword args for :class:`~MyModule`
 
     Examples
     --------
