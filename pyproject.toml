@@ -8,7 +8,6 @@ version = "0.0.1"
 description = "External and simple implementation of scVI"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {file = "LICENSE"}
 authors = [
     {name = "The scvi-tools development team"},
 ]
