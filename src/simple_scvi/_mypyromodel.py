@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import logging
-from typing import List, Optional, Sequence, Union
+from collections.abc import Sequence
 
 import numpy as np
 import torch
@@ -16,6 +18,7 @@ from scvi.dataloaders import DataSplitter
 from scvi.model.base import BaseModelClass
 from scvi.train import PyroTrainingPlan, TrainRunner
 from scvi.utils import setup_anndata_dsp
+from scvi.utils._docstrings import devices_dsp
 
 from ._mypyromodule import MyPyroModule
 
@@ -40,6 +43,7 @@ class MyPyroModel(BaseModelClass):
         Number of hidden layers used for encoder and decoder NNs.
     **model_kwargs
         Keyword args for :class:`~mypackage.MyModule`
+
     Examples
     --------
     >>> adata = anndata.read_h5ad(path_to_anndata)
@@ -68,7 +72,9 @@ class MyPyroModel(BaseModelClass):
             n_layers=n_layers,
             **model_kwargs,
         )
-        self._model_summary_string = "Overwrite this attribute to get an informative representation for your model"
+        self._model_summary_string = (
+            "Overwrite this attribute to get an informative representation for your model"
+        )
         # necessary line to get params that will be used for saving/loading
         self.init_params_ = self._get_init_params(locals())
 
@@ -76,9 +82,9 @@ class MyPyroModel(BaseModelClass):
 
     def get_latent(
         self,
-        adata: Optional[AnnData] = None,
-        indices: Optional[Sequence[int]] = None,
-        batch_size: Optional[int] = None,
+        adata: AnnData | None = None,
+        indices: Sequence[int] | None = None,
+        batch_size: int | None = None,
     ):
         """
         Return the latent representation for each cell.
@@ -94,6 +100,7 @@ class MyPyroModel(BaseModelClass):
             Indices of cells in adata to use. If `None`, all cells are used.
         batch_size
             Minibatch size for data loading into model. Defaults to `scvi.settings.batch_size`.
+
         Returns
         -------
         latent_representation : np.ndarray
@@ -107,14 +114,16 @@ class MyPyroModel(BaseModelClass):
             latent += [qz_m.cpu()]
         return np.array(torch.cat(latent))
 
+    @devices_dsp.dedent
     def train(
         self,
-        max_epochs: Optional[int] = None,
-        use_gpu: Optional[Union[str, int, bool]] = None,
+        max_epochs: int | None = None,
+        accelerator: str = "auto",
+        devices: int | list[int] | str = "auto",
         train_size: float = 0.9,
-        validation_size: Optional[float] = None,
+        validation_size: float | None = None,
         batch_size: int = 128,
-        plan_kwargs: Optional[dict] = None,
+        plan_kwargs: dict | None = None,
         **trainer_kwargs,
     ):
         """
@@ -125,9 +134,8 @@ class MyPyroModel(BaseModelClass):
         max_epochs
             Number of passes through the dataset. If `None`, defaults to
             `np.min([round((20000 / n_cells) * 400), 400])`
-        use_gpu
-            Use default GPU if available (if None or True), or index of GPU to use (if int),
-            or name of GPU (if str), or use CPU (if False).
+        %(param_accelerator)s
+        %(param_devices)s
         train_size
             Size of training set in the range [0.0, 1.0].
         validation_size
@@ -145,14 +153,13 @@ class MyPyroModel(BaseModelClass):
             n_cells = self.adata.n_obs
             max_epochs = np.min([round((20000 / n_cells) * 400), 400])
 
-        plan_kwargs = plan_kwargs if isinstance(plan_kwargs, dict) else dict()
+        plan_kwargs = plan_kwargs if isinstance(plan_kwargs, dict) else {}
 
         data_splitter = DataSplitter(
             self.adata_manager,
             train_size=train_size,
             validation_size=validation_size,
             batch_size=batch_size,
-            use_gpu=use_gpu,
         )
         training_plan = PyroTrainingPlan(self.module, **plan_kwargs)
         runner = TrainRunner(
@@ -160,7 +167,8 @@ class MyPyroModel(BaseModelClass):
             training_plan=training_plan,
             data_splitter=data_splitter,
             max_epochs=max_epochs,
-            use_gpu=use_gpu,
+            accelerator=accelerator,
+            devices=devices,
             **trainer_kwargs,
         )
         return runner()
@@ -170,13 +178,13 @@ class MyPyroModel(BaseModelClass):
     def setup_anndata(
         cls,
         adata: AnnData,
-        batch_key: Optional[str] = None,
-        labels_key: Optional[str] = None,
-        layer: Optional[str] = None,
-        categorical_covariate_keys: Optional[List[str]] = None,
-        continuous_covariate_keys: Optional[List[str]] = None,
+        batch_key: str | None = None,
+        labels_key: str | None = None,
+        layer: str = None,
+        categorical_covariate_keys: list[str] | None = None,
+        continuous_covariate_keys: list[str] | None = None,
         **kwargs,
-    ) -> Optional[AnnData]:
+    ) -> AnnData | None:
         """
         %(summary)s.
 
@@ -188,6 +196,7 @@ class MyPyroModel(BaseModelClass):
         %(param_layer)s
         %(param_cat_cov_keys)s
         %(param_cont_cov_keys)s
+
         Returns
         -------
         %(returns)s

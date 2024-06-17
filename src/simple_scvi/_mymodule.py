@@ -1,4 +1,4 @@
-from typing import Dict
+from __future__ import annotations
 
 import numpy as np
 import torch
@@ -10,7 +10,7 @@ from scvi.nn import DecoderSCVI, Encoder, one_hot
 from torch.distributions import Normal
 from torch.distributions import kl_divergence as kl
 
-TensorDict = Dict[str, torch.Tensor]
+TensorDict = dict[str, torch.Tensor]
 
 
 class MyModule(BaseModuleClass):
@@ -28,8 +28,8 @@ class MyModule(BaseModuleClass):
         1 x n_batch array of means of the log library sizes. Parameterizes prior on library size if
         not using observed library size.
     library_log_vars
-        1 x n_batch array of variances of the log library sizes. Parameterizes prior on library size if
-        not using observed library size.
+        1 x n_batch array of variances of the log library sizes. Parameterizes prior on library
+        size if not using observed library size.
     n_batch
         Number of batches, if 0, no batch correction is performed.
     n_hidden
@@ -93,7 +93,7 @@ class MyModule(BaseModuleClass):
         """Parse the dictionary to get appropriate args"""
         x = tensors[REGISTRY_KEYS.X_KEY]
 
-        input_dict = dict(x=x)
+        input_dict = {"x": x}
         return input_dict
 
     def _get_generative_input(self, tensors, inference_outputs):
@@ -119,7 +119,14 @@ class MyModule(BaseModuleClass):
         qz_m, qz_v, z = self.z_encoder(x_)
         ql_m, ql_v, library = self.l_encoder(x_)
 
-        outputs = dict(z=z, qz_m=qz_m, qz_v=qz_v, ql_m=ql_m, ql_v=ql_v, library=library)
+        outputs = {
+            "z": z,
+            "qz_m": qz_m,
+            "qz_v": qz_v,
+            "ql_m": ql_m,
+            "ql_v": ql_v,
+            "library": library,
+        }
         return outputs
 
     @auto_move_data
@@ -129,7 +136,12 @@ class MyModule(BaseModuleClass):
         px_scale, _, px_rate, px_dropout = self.decoder("gene", z, library)
         px_r = torch.exp(self.px_r)
 
-        return dict(px_scale=px_scale, px_r=px_r, px_rate=px_rate, px_dropout=px_dropout)
+        return {
+            "px_scale": px_scale,
+            "px_r": px_r,
+            "px_rate": px_rate,
+            "px_dropout": px_dropout,
+        }
 
     def loss(
         self,
@@ -164,7 +176,9 @@ class MyModule(BaseModuleClass):
         ).sum(dim=1)
 
         reconst_loss = (
-            -ZeroInflatedNegativeBinomial(mu=px_rate, theta=px_r, zi_logits=px_dropout).log_prob(x).sum(dim=-1)
+            -ZeroInflatedNegativeBinomial(mu=px_rate, theta=px_r, zi_logits=px_dropout)
+            .log_prob(x)
+            .sum(dim=-1)
         )
 
         kl_local_for_warmup = kl_divergence_z
@@ -174,7 +188,10 @@ class MyModule(BaseModuleClass):
 
         loss = torch.mean(reconst_loss + weighted_kl_local)
 
-        kl_local = dict(kl_divergence_l=kl_divergence_l, kl_divergence_z=kl_divergence_z)
+        kl_local = {
+            "kl_divergence_l": kl_divergence_l,
+            "kl_divergence_z": kl_divergence_z,
+        }
         return LossOutput(loss=loss, reconstruction_loss=reconst_loss, kl_local=kl_local)
 
     @torch.no_grad()
@@ -197,12 +214,13 @@ class MyModule(BaseModuleClass):
             Number of required samples for each cell
         library_size
             Library size to scale scamples to
+
         Returns
         -------
         x_new
             tensor with shape (n_cells, n_genes, n_samples)
         """
-        inference_kwargs = dict(n_samples=n_samples)
+        inference_kwargs = {"n_samples": n_samples}
         (
             _,
             generative_outputs,
@@ -249,9 +267,15 @@ class MyModule(BaseModuleClass):
 
             # Log-probabilities
             n_batch = self.library_log_means.shape[1]
-            local_library_log_means = F.linear(one_hot(batch_index, n_batch), self.library_log_means)
+            local_library_log_means = F.linear(
+                one_hot(batch_index, n_batch), self.library_log_means
+            )
             local_library_log_vars = F.linear(one_hot(batch_index, n_batch), self.library_log_vars)
-            p_l = Normal(local_library_log_means, local_library_log_vars.sqrt()).log_prob(library).sum(dim=-1)
+            p_l = (
+                Normal(local_library_log_means, local_library_log_vars.sqrt())
+                .log_prob(library)
+                .sum(dim=-1)
+            )
 
             p_z = Normal(torch.zeros_like(qz_m), torch.ones_like(qz_v)).log_prob(z).sum(dim=-1)
             p_x_zl = -reconst_loss

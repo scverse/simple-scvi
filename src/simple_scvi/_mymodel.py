@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import logging
-from typing import List, Optional
 
 from anndata import AnnData
 from scvi import REGISTRY_KEYS
@@ -38,6 +39,7 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
         Number of hidden layers used for encoder and decoder NNs.
     **model_kwargs
         Keyword args for :class:`~mypackage.MyModule`
+
     Examples
     --------
     >>> adata = anndata.read_h5ad(path_to_anndata)
@@ -57,7 +59,9 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
     ):
         super().__init__(adata)
 
-        library_log_means, library_log_vars = _init_library_size(self.adata_manager, self.summary_stats["n_batch"])
+        library_log_means, library_log_vars = _init_library_size(
+            self.adata_manager, self.summary_stats["n_batch"]
+        )
 
         # self.summary_stats provides information about anndata dimensions and other tensor info
 
@@ -70,7 +74,9 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
             library_log_vars=library_log_vars,
             **model_kwargs,
         )
-        self._model_summary_string = "Overwrite this attribute to get an informative representation for your model"
+        self._model_summary_string = (
+            "Overwrite this attribute to get an informative representation for your model"
+        )
         # necessary line to get params that will be used for saving/loading
         self.init_params_ = self._get_init_params(locals())
 
@@ -81,13 +87,13 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
     def setup_anndata(
         cls,
         adata: AnnData,
-        batch_key: Optional[str] = None,
-        labels_key: Optional[str] = None,
-        layer: Optional[str] = None,
-        categorical_covariate_keys: Optional[List[str]] = None,
-        continuous_covariate_keys: Optional[List[str]] = None,
+        batch_key: str | None = None,
+        labels_key: str | None = None,
+        layer: str | None = None,
+        categorical_covariate_keys: list[str] | None = None,
+        continuous_covariate_keys: list[str] | None = None,
         **kwargs,
-    ) -> Optional[AnnData]:
+    ) -> AnnData | None:
         """
         %(summary)s.
 
@@ -99,6 +105,7 @@ class MyModel(VAEMixin, UnsupervisedTrainingMixin, BaseModelClass):
         %(param_layer)s
         %(param_cat_cov_keys)s
         %(param_cont_cov_keys)s
+
         Returns
         -------
         %(returns)s

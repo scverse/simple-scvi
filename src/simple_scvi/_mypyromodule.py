@@ -1,4 +1,4 @@
-from typing import Dict
+from __future__ import annotations
 
 import pyro
 import pyro.distributions as dist
@@ -8,7 +8,7 @@ from scvi import REGISTRY_KEYS
 from scvi.module.base import PyroBaseModuleClass, auto_move_data
 from scvi.nn import DecoderSCVI, Encoder
 
-TensorDict = Dict[str, torch.Tensor]
+TensorDict = dict[str, torch.Tensor]
 
 
 class MyPyroModule(PyroBaseModuleClass):
