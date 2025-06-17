@@ -81,3 +81,5 @@ If you like scverse® and want to support our mission, please consider making a 
   >
 </a>
 </div>
+
+Copyright (c) 2025, Yosef Lab, Weizmann Institute of Sceince
