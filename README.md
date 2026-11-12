@@ -15,7 +15,7 @@ This package was initialized using the [cookicutter-scverse](https://github.com/
 
 Please refer to the [documentation][link-docs]. In particular, the
 
--   [API documentation][link-api].
+- [API documentation][link-api].
 
 ## Installation
 
@@ -67,8 +67,7 @@ If you found a bug, please use the [issue tracker][issue-tracker].
 [changelog]: https://simple-scvi.readthedocs.io/latest/changelog.html
 [link-docs]: https://simple-scvi.readthedocs.io
 [link-api]: https://simple-scvi.readthedocs.io/latest/api.html
-
-[//]: # (numfocus-fiscal-sponsor-attribution)
+[//]: # "numfocus-fiscal-sponsor-attribution"
 
 simple-scvi is part of the scverse® project ([website](https://scverse.org), [governance](https://scverse.org/about/roles)) and is fiscally sponsored by [NumFOCUS](https://numfocus.org/).
 If you like scverse® and want to support our mission, please consider making a tax-deductible [donation](https://numfocus.org/donate-to-scverse) to help the project pay for developer time, professional services, travel, workshops, and a variety of other needs.
